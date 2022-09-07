@@ -5,9 +5,11 @@ const generator = rough.generator();
 
 const Draw = () => {
     const [elements, setElements] = useState([]);
-    const [drawing, setDrawing] = useState(false);
-    const [tool, setElementType] = useState("line");
-  
+    const [action, setAction] = useState(false);
+    const [tool, setTool] = useState("line");
+    const [selectedElement, setSelectedElement] = useState(null);
+
+
     useLayoutEffect(() => {
   //Esto se esta reaciendo constantemente como el update de unity
         const canvas = document.getElementById("canvas");
@@ -19,50 +21,103 @@ const Draw = () => {
       //cual es la diferencia?  elements.forEach(element => roughCanvas.draw(element.roughElement));
     }, [elements]);//explicar esto tambien
   
-  
-    const handleMouseDown = (event) => {
-      setDrawing(true);
-  
-      
-      const { clientX,clientY } = event;
-      const element = createElement(clientX,clientY,clientX,clientY,tool);
-  
-      //   que explique que es prevState y porque asi
-      setElements(prevState => [...prevState, element]);
-    };
-  
-    const handleMouseMove = (event) => {
-      if(!drawing) return;
-      const { clientX,clientY } = event;
-      const index =  elements.length - 1; 
-      //pedir profe que explique bien
-      const{x1,y1} = elements[index];
-      const updateElement = createElement(x1,y1,clientX,clientY,tool);
+
+    const updateElement = (id,x1,y1,x2,y2,type) => {
+      const updateElement = createElement(id,x1,y1,x2,y2,type);
   
       //tambien que es el ...
       const elementCopy = [...elements];
-      elementCopy[index] = updateElement;
+      elementCopy[id] = updateElement;
       setElements(elementCopy);
-  
     }
+
+    const handleMouseDown = (event) => {
+      const { clientX,clientY } = event;
+      if(tool === "selection"){
+        const element = getElementAtPosition(clientX,clientY,elements);
+        console.log("handle mouse down element:"+element);
+        if(element){
+          const offsetX= clientX - element.x1;
+          const offsetY= clientY - element.y1;
+          setSelectedElement({...element,offsetX,offsetY});
+          setAction("moving");
+      
+        }} 
+      else{
+      setAction("drawing");
+        
+      const id = elements.length;
+      const element = createElement(id,clientX,clientY,clientX,clientY,tool);
+  
+      //   que explique que es prevState y porque asi
+      setElements(prevState => [...prevState, element]);
+    }
+  };
+  
+    const handleMouseMove = (event) => {
+      const { clientX,clientY } = event;
+      if(action === "drawing"){ 
+        const index =  elements.length - 1; 
+        const{x1,y1} = elements[index];
+        updateElement(index,x1,y1,clientX,clientY,tool);
+      }
+      else if( action === "moving"){
+        const {id, x1,x2,y1,y2,type,offsetX,offsetY} =selectedElement;
+        const width = x2 - x1;  
+        const height = y2 - y1;
+        const nexX1 = clientX  - offsetX;
+        const nexY1 = clientY  - offsetY;
+        updateElement(id,nexX1,nexY1,clientX + width,clientY+height,type);
+      }
+    };
     const handleMouseUp = () => {
-      setDrawing(false);
+      setAction("none");
     };
   
-  
-    function createElement(x1,y1,x2,y2){
+    const isWithinElement = (x,y,element) => {
+      const {type,x1,x2,y1,y2} = element;
+
+      if (type ==="rect"){
+        const minX = Math.min(x1,x2);
+        const maxX = Math.max(x1,x2);
+        const minY = Math.min(y1,y2);
+        const maxY = Math.max(y1,y2);
+        console.log("minX:"+minX+" maxX:"+maxX+" minY:"+minY+" maxY:"+maxY);
+        return x >= minX && x <= maxX && y >= minY && y <= maxY;
+      }
+      else if(type === "line"){
+        const a = {x:x1,y:y1};
+        const b = {x:x2,y:y2};
+        const c = {x,y};
+        console.log("a:",a," b:",b," c:",c);
+        console.log("distance ab:",distance(a,b)," distance ac:",distance(a,c)," distance bc:",distance(b,c));
+        const offset  = distance(a,b) - (distance(a,c) + distance(b,c)); 
+        return Math.abs(offset) < 1;
+      }
+      else if(type === "circle"){
+          //por hacer
+      }
+    } 
+//hipotenusa
+    const distance = (a,b) => Math.sqrt(Math.pow(a.x - b.x,2) + Math.pow(a.y - b.y,2));
+
+    const getElementAtPosition = (x,y,elements) => {
+      return elements.find(element => isWithinElement(x,y,element));
+    }
+
+    function createElement(id,x1,y1,x2,y2 ,type){
       let roughElement = generator.line(x1,y1,x2,y2);
-      if(tool === "line"){
+      if(type === "line"){
          roughElement = generator.line(x1,y1,x2,y2);
       }
-      if(tool === "rect"){
+      if(type === "rect"){
          roughElement = generator.rectangle(x1,y1,x2-x1,y2-y1);
       } 
   
-      if(tool === "circle"){
+      if(type === "circle"){
          roughElement = generator.ellipse(x1,y1,x2,y2);
       }
-      return {x1,y1,x2,y2, roughElement};
+      return {id,x1,y1,x2,y2, type,roughElement};
     }
     
   
@@ -74,20 +129,21 @@ const Draw = () => {
           type={"radio"}
           id={"selection"}
           checked ={tool === "selection"}
-          onChange={() => setElementType("selection")}
+          onChange={() => setTool("selection")}
           />
+          <label htmlFor={"selection"}>selection</label>
           <input
           type={"radio"}
           id={"line"}
           checked ={tool === "line"}
-          onChange={() => setElementType("line")}
+          onChange={() => setTool("line")}
           />
           <label htmlFor={"line"}>Line</label>
           <input
           type={"radio"}
           id={"rect"}
           checked ={tool === "rect"}
-          onChange={() => setElementType("rect")}
+          onChange={() => setTool("rect")}
           />
           <label htmlFor={"rect"}>Rect</label>
   
@@ -95,7 +151,7 @@ const Draw = () => {
           type={"radio"}
           id={"circle"}
           checked ={tool === "circle"}
-          onChange={() => setElementType("circle")}
+          onChange={() => setTool("circle")}
           />
           <label htmlFor={"circle"}>Circle</label>
         </div>
@@ -113,4 +169,5 @@ const Draw = () => {
       
     );
 }
+
 export default Draw;
