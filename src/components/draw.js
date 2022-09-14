@@ -71,28 +71,41 @@ const Draw = () => {
       }
     };
     const handleMouseUp = () => {
+      if(action === "drawing"){
+        const index =  elements.length - 1; 
+        const{id,type} = elements[index];
+        const {x1,x2,y1,y2} = adjustElementCoordinates(elements[index]);
+        updateElement(id,x1,x2,y1,y2,type);
+
+      }
       setAction("none");
+      setSelectedElement(null);
     };
-  
-    const isWithinElement = (x,y,element) => {
+    const nearPoint(x,y,x1,y2,name){
+      return Math.abs(x - x1) < 5 && Math.abs(y - y2) < 5 ? name : null;; 
+    }
+
+
+    const PositionWithinElement = (x,y,element) => {
       const {type,x1,x2,y1,y2} = element;
 
-      if (type ==="rect"){
-        const minX = Math.min(x1,x2);
-        const maxX = Math.max(x1,x2);
-        const minY = Math.min(y1,y2);
-        const maxY = Math.max(y1,y2);
-        console.log("minX:"+minX+" maxX:"+maxX+" minY:"+minY+" maxY:"+maxY);
-        return x >= minX && x <= maxX && y >= minY && y <= maxY;
+      if (type ==="rect"){                
+        const topLeft = nearPoint(x,y,x1,y1,"tl");
+        const topRight = nearPoint(x,y,x2,y1,"tl");
+        const bottomLeft = nearPoint(x,y,x1,y2,"tl");
+        const bottomRight = nearPoint(x,y,x2,y2,"tl");  
+        const inside = x >= x1 && x <= x2 && y >= y1 && y <= y2 ? "inside":null;
+        return topLeft ||topRight||bottomLeft||bottomRight || inside;
       }
       else if(type === "line"){
         const a = {x:x1,y:y1};
         const b = {x:x2,y:y2};
         const c = {x,y};
-        console.log("a:",a," b:",b," c:",c);
-        console.log("distance ab:",distance(a,b)," distance ac:",distance(a,c)," distance bc:",distance(b,c));
         const offset  = distance(a,b) - (distance(a,c) + distance(b,c)); 
-        return Math.abs(offset) < 1;
+        const start = nearPoint(x,y,x1,y1,"start");
+        const end = nearPoint(x,y,x2,y2,"end");
+        const inside = Math.abs(offset) < 1 ? "inside":null; 
+        return start || end || inside;
       }
       else if(type === "circle"){
           //por hacer
@@ -102,8 +115,27 @@ const Draw = () => {
     const distance = (a,b) => Math.sqrt(Math.pow(a.x - b.x,2) + Math.pow(a.y - b.y,2));
 
     const getElementAtPosition = (x,y,elements) => {
-      return elements.find(element => isWithinElement(x,y,element));
+      return elements.map(element => ({PositionWithinElement(x,y,element)}));
     }
+
+    const adjustElementCoordinates = (element) => {
+        const{type,x1,x2,y1,y2} = element;
+        if(type === "rect"){
+          const minX = Math.min(x1,x2);
+          const maxX = Math.max(x1,x2);
+          const minY = Math.min(y1,y2);
+          const maxY = Math.max(y1,y2);
+          return {x1:minX,x2:maxX,y1:minY,y2:maxY,type};
+        }
+        else if(type === "line"){
+          if(x1<x2|| (x1 === x2 && y1 <y2)){
+            return {x1,y1,x2,y2};
+          }
+          else{
+            return {x1: x2,y1:y2,x2:x1,y2:y1};
+          }
+        }
+    };
 
     function createElement(id,x1,y1,x2,y2 ,type){
       let roughElement = generator.line(x1,y1,x2,y2);
