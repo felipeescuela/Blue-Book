@@ -11,12 +11,14 @@ const Draw = () => {
 
 
     useLayoutEffect(() => {
+
   //Esto se esta reaciendo constantemente como el update de unity
         const canvas = document.getElementById("canvas");
         const roughCanvas = rough.canvas(canvas);
         const context = canvas.getContext("2d");
         context.clearRect(0,0,canvas.width,canvas.height);
   
+        //oughCanvas.line(100,200,300,400);
        elements.forEach(({roughElement}) => roughCanvas.draw(roughElement));
       //cual es la diferencia?  elements.forEach(element => roughCanvas.draw(element.roughElement));
     }, [elements]);//explicar esto tambien
@@ -81,7 +83,7 @@ const Draw = () => {
       setAction("none");
       setSelectedElement(null);
     };
-    const nearPoint(x,y,x1,y2,name){
+    const nearPoint = (x,y,x1,y2,name) => {
       return Math.abs(x - x1) < 5 && Math.abs(y - y2) < 5 ? name : null;; 
     }
 
@@ -115,7 +117,9 @@ const Draw = () => {
     const distance = (a,b) => Math.sqrt(Math.pow(a.x - b.x,2) + Math.pow(a.y - b.y,2));
 
     const getElementAtPosition = (x,y,elements) => {
-      return elements.map(element => ({PositionWithinElement(x,y,element)}));
+      return elements
+      .map(element => ({...element,position: PositionWithinElement(x,y,element)}))
+      .find(element => element.position !== null);
     }
 
     const adjustElementCoordinates = (element) => {
@@ -143,7 +147,7 @@ const Draw = () => {
          roughElement = generator.line(x1,y1,x2,y2);
       }
       if(type === "rect"){
-         roughElement = generator.rectangle(x1,y1,x2-x1,y2-y1);
+         roughElement = generator.rectangle(x1,y1,x2,y2);
       } 
   
       if(type === "circle"){
@@ -152,7 +156,6 @@ const Draw = () => {
       return {id,x1,y1,x2,y2, type,roughElement};
     }
     
-  
   
     return (
       <div>
