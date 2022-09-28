@@ -1,4 +1,4 @@
-import Draw from "./components/draw";
+import Draw from "./components/draw.js";
 
 const App = () => {
     
