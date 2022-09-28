@@ -95,8 +95,7 @@ const Draw = () => {
                 return {x1: clientX, y1, x2, y2: clientY};
             case "bottom-right":
             case "end":
-                return {x1, y1, x2: clientX, y2: clientY};
-             
+                return {x1, y1, x2: clientX, y2: clientY};  
                 default:
                 return null; //esto no deberia pasar
         }
@@ -124,13 +123,23 @@ const Draw = () => {
 //#region Mouse events
     const handleMouseDown = (event) => {
         const { clientX, clientY } = event;
-        if(actual_tool = tools.selection)
+        if(actual_tool === tools.selection)
         {
             const element = GetElementAtPosition(clientX,clientY);
-
+            
+            if(element){
             const offsetX = clientX - element.x1;
             const offsetY = clientY - element.y1;
             setSelectedElement({ ...element, offsetX, offsetY });
+            }
+            setElements(prevState => prevState);
+
+            if(element.position === "inside"){
+                setAction(actions.moving);
+            }
+            else{
+                setAction(actions.resizing);
+            }
         }
         else{
             //crea un nuevo elemento y lo deja seleccionado
@@ -148,7 +157,7 @@ const Draw = () => {
         const { clientX, clientY } = event;
         if(actual_tool === tools.selection){
             const element = GetElementAtPosition(clientX,clientY);
-        }
+                }
         
         if(actual_action === actions.drawing){
             const index = elements.length -1;
@@ -180,6 +189,8 @@ const Draw = () => {
                     UpdateElement(index,x1,y1,x2,y2,type);
                 }
             }
+        setAction("none");
+        setSelectedElement(null);
     }
     
 //#endregion
@@ -228,7 +239,7 @@ const OffsetOverPoint = (x, y, x1, y1, name) => {
   };
   
 //encuentra el elemento que se encuentra en la posicion x,y
-  const GetElementAtPosition = (x, y, elements) => {
+  const GetElementAtPosition = (x, y) => {
     return elements
       .map(element => ({ ...element, position: PositionInsideElement(x, y, element) }))
       .find(element => element.position !== null);
