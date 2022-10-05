@@ -275,7 +275,7 @@ const DrawTools = () => {
             <div>
 
                 {/*element selector*/}
-                <div style={{ position: "fixed" }}>
+                <div >
                     <input
                         id="selection"
                         type="radio"
