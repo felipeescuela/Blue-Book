@@ -32,15 +32,17 @@ const App = () => {
                     </div>
                 </div>
 
-                <div id="content">
+                <Grid container columns={{md: 16 ,lg: 20}}>
                 
-                <div id="indice"></div>
-                <div id ="pagina">               
+                <Grid md={3} lg={4} id="indice" >
+
+                </Grid>
+                <Grid md={10} lg={12} id ="pagina">               
                     <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
-                </div>
-                <div id="gestor de archivos"></div>
+                </Grid  >
+                <Grid md={3} lg={4} id="gestor de archivos"></Grid>
+                </Grid>
             </div>
-        </div>
         </div>
     );
 }
