@@ -6,6 +6,11 @@
   height: 40vmin;
   pointer-events: none;
 }
+canvas{
+  margin-left: 30%;
+  position: static;
+  border-style: solid;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
@@ -35,4 +40,28 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+header{
+  display: flex;
+}
+
+#title_menu{
+  display: flex;
+}
+
+#content{
+  display: flex;
+}
+
+.icon {
+  height: 20px;
+  width: 20px;
+  margin-right: 20px;
+}
+
+
+.arbol {
+  text-align: left;
+  list-style: none;
 }

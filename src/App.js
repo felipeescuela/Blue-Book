@@ -1,5 +1,41 @@
 import DrawTools from "./components/DrawComponents/DrawTools.js";
 import CanvasDraw from "./components/DrawComponents/CanvasDraw.js";
+import FileManager from "./components/FileManagerComponents/FileManager.js";
+
+import "./App.css"
+
+const filesExample = [
+    {
+        name: "carpeta nº1",
+        type: "folder",
+        files: []
+    }, {
+        name: "carpeta nº2",
+        type: "folder",
+        files: [{
+            name: "interno nº2",
+            type: "file",
+        }, {
+            name: "interno nº3",
+            type: "file",
+        }, {
+            name: "carpeta nº2",
+            type: "folder",
+            files: [{
+                name: "interno nº2",
+                type: "file",
+            }, {
+                name: "interno nº3",
+                type: "file",
+            }]
+        },],
+    }, {
+        name: "carpeta nº3",
+        type: "folder",
+        files: []
+    }
+]
+
 const App = () => {
     const { Tools: ToolsDraw, handleMouseDown, handleMouseMove, handleMouseUp } = DrawTools();
     {/*la funcion de los id por el momento es solo ilustrativa */ }
@@ -33,16 +69,20 @@ const App = () => {
                 </div>
 
                 <div id="content">
-                
-                <div id="indice"></div>
-                <div id ="pagina">               
-                    <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
+
+                    <div id="indice">
+                        <h3>indice</h3>
+                    </div>
+                    <div id="pagina">
+                        <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
+                    </div>
+                    <div id="gestor de archivos">
+                        <FileManager files={filesExample}></FileManager>
+                    </div>
                 </div>
-                <div id="gestor de archivos"></div>
             </div>
-        </div>
         </div>
     );
 }
 
-            export default App;
+export default App;
