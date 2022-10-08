@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useState } from "react";
 import rough from 'roughjs/bundled/rough.esm.js';
 
+
 const generator = rough.generator();
 
 //#region  enums
@@ -42,7 +43,7 @@ const CreateElement = (id, x1, y1, x2, y2, type) => {
             return { id, x1, y1, x2, y2, type, roughElement };
             break;
         case types.ellipse:
-            //hay que buscar la manera para que el mouse no quede en el centro
+            //TODO hay que buscar la manera para que el mouse no quede en el centro
             roughElement = generator.ellipse(x1, y1, x2 - x1, y2 - y1);
             return { id, x1, y1, x2, y2, type, roughElement };
         default:
@@ -110,7 +111,7 @@ const DrawTools = () => {
             const minY = Math.min(y1, y2);
             const maxX = Math.max(x1, x2);
             const maxY = Math.max(y1, y2);
-            //ajusta los valores del rectangulo para que el XY2 siempre sea el mayor    
+            //ajusta los valores del rectangulo para que el XY2 siempre sea el mayor
             return { x1: minX, y1: minY, x2: maxX, y2: maxY };
         }
         else {

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Filee from "./Filee";
 
 const FileManager = ({ files }) => {
