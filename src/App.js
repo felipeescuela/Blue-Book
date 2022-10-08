@@ -1,5 +1,9 @@
 import DrawTools from "./components/DrawComponents/DrawTools.js";
 import CanvasDraw from "./components/DrawComponents/CanvasDraw.js";
+import Grid from '@mui/material/Grid';
+import './App.css';
+
+
 const App = () => {
     const { Tools: ToolsDraw, handleMouseDown, handleMouseMove, handleMouseUp } = DrawTools();
     {/*la funcion de los id por el momento es solo ilustrativa */ }
@@ -33,14 +37,15 @@ const App = () => {
                 </div>
 
                 <Grid container columns={{md: 16 ,lg: 20}}>
-                
-                <Grid md={3} lg={4} id="indice" >
+                    <Grid md={3} lg={4} id="indice" >
 
-                </Grid>
-                <Grid md={10} lg={12} id ="pagina">               
-                    <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
-                </Grid  >
-                <Grid md={3} lg={4} id="gestor de archivos"></Grid>
+                    </Grid>
+                    <Grid md={10} lg={12} id ="pagina">               
+                        <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
+                    </Grid>
+                    <Grid md={3} lg={4} id="gestor de archivos">
+                        
+                    </Grid>
                 </Grid>
             </div>
         </div>
