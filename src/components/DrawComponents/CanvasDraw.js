@@ -10,11 +10,12 @@ const CanvasDraw = ({
     return (
         <canvas
         id="canvas"
-        width={window.innerWidth}
+        width={window.innerWidth/1.75}
         height={window.innerHeight}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}>
+        
       </canvas>
     );
 }

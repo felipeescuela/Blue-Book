@@ -1,55 +1,104 @@
 import DrawTools from "./components/DrawComponents/DrawTools.js";
 import CanvasDraw from "./components/DrawComponents/CanvasDraw.js";
+import FileManager from "./components/FileManagerComponents/FileManager.js";
 import Grid from '@mui/material/Grid';
-import './App.css';
+import Button from '@mui/material/Button';
 
+import "./App.css"
+
+const filesExample = [
+    {
+        name: "carpeta nº1",
+        type: "folder",
+        files: []
+    }, {
+        name: "carpeta nº2",
+        type: "folder",
+        files: [{
+            name: "interno nº2",
+            type: "file",
+        }, {
+            name: "interno nº3",
+            type: "file",
+        }, {
+            name: "carpeta nº2",
+            type: "folder",
+            files: [{
+                name: "interno nº2",
+                type: "file",
+            }, {
+                name: "interno nº3",
+                type: "file",
+            }]
+        },],
+    }, {
+        name: "carpeta nº3",
+        type: "folder",
+        files: []
+    }
+]
 
 const App = () => {
     const { Tools: ToolsDraw, handleMouseDown, handleMouseMove, handleMouseUp } = DrawTools();
     {/*la funcion de los id por el momento es solo ilustrativa */ }
     return (
-        <div>
+        <div id="BodySim">
+            {/*TODO arreglar el desplazamiento de todo la pagina  */}
             <header>
-                <h1>Informatica</h1>
-                <div id="title_menu">
-                    <h3>File</h3>
-                    <h3>Edit</h3>
-                    <h3>View</h3>
-                    <h3>WorkTable</h3>
-                </div>
-                <div id="buscador">
-                    <input type="text" placeholder="Buscar" />
-                </div>
+                <Grid id="headin" container columns={{ xs: 2 }} >
+                    <Grid container id="title_menu" rows={{ xs: 3 }} xs={3}>
+                        <h1 id="title">Informatica</h1>
+                        <Grid>
+                            <ul className="navmenu">
+                                <li><Button variant="text">File</Button></li>
+                                <li><Button variant="text">Edit</Button></li>
+                                <li><Button variant="text">View</Button></li>
+                                <li><Button variant="text">WorkTable</Button></li>
+                            </ul>
+                        </Grid>
+                        <div id="tools">
+                            {/*TODO <div id="color_selector">
+                    </div>*/}
+
+                            {/*TODO<div id="text_tools">
+                    </div>*/}
+
+                            <ToolsDraw />
+
+                            {/*TODO <div id="diagram_tools">
+                    </div>*/}
+                        </div>
+                    </Grid>
+                    <div id="buscador">
+                        <input type="text" placeholder="Buscar" />
+                    </div>
+
+                </Grid>
             </header>
 
-            <div id="main">
-                <div id="tools">
-                    <div id="color_selector">
-                    </div>
+            <Grid container columns={{ md: 16, lg: 20 }} id="main">
 
-                    <div id="text_tools">
-                    </div>
+                <Grid container columns={{ md: 16, lg: 20 }} id="content">
 
-                    <ToolsDraw />
-
-                    <div id="diagram_tools">
-                    </div>
-                </div>
-
-                <Grid container columns={{md: 16 ,lg: 20}}>
-                    <Grid md={3} lg={4} id="indice" >
-
+                    <Grid md={3} lg={2} id="indice">
+                        <ul className="lista">
+                            <li>Indice
+                                <ul>
+                                    <li><a href="#canvas">Titulo 1</a></li>
+                                </ul>
+                            </li>
+                        </ul>
                     </Grid>
-                    <Grid md={10} lg={12} id ="pagina">               
+                    <Grid md={10} lg={15} id="pagina">
                         <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
                     </Grid>
-                    <Grid md={3} lg={4} id="gestor de archivos">
-                        
+                    <Grid md={3} lg={3} id="gestor de archivos">
+                        <FileManager files={filesExample}></FileManager>
                     </Grid>
                 </Grid>
-            </div>
+            </Grid>
         </div>
     );
 }
 
-            export default App;
+export default App;
