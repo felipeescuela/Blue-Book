@@ -4,7 +4,7 @@ function Filee({ name, type, files }) {
 
 
     return (
-        <li><img className="icon" src={type+".svg"} />{name}
+        <li><img alt="unable to load" className="icon" src={type + ".svg"} />{name}
             {files && <FileManager files={files} />}
         </li>
     )
