@@ -58,12 +58,18 @@ let canvas = null;
 let context = null;
 
 const GetTransformedPointToCanvas = (x, y) => {
-    if (canvas !== null || context !== null) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: x - rect.left,
+        y: y - rect.top
+    };
+    /* if (canvas !== null || context !== null) {
         //transforma el punto a un punto relativo al canvas
         const originalPoint = new DOMPoint(x, y);
+        console.log(originalPoint);
         //el invert es utilizado por si el canvas es escalado
         return context.getTransform().invertSelf().transformPoint(originalPoint);
-    }
+    }*/
 }
 
 const DrawTools = () => {
