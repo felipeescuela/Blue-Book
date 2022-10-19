@@ -17,6 +17,7 @@ const actions = {
     drawing: "drawing",
     moving: "moving",
     resizing: "resizing",
+    erasing : "erasing",
     none: "none"
 }
 
@@ -26,6 +27,7 @@ const tools = {
     rectangle: "rectangle",
     pencil: "pencil",
     ellipse: "ellipse",
+    eraser: "eraser",
     none: "none"
 }
 //#endregion
@@ -61,16 +63,9 @@ let context = null;
 const GetTransformedPointToCanvas = (x, y) => {
     var rect = canvas.getBoundingClientRect();
     return {
-        x: x - rect.left,
+        x: x - rect.left,       
         y: y - rect.top
     };
-    /* if (canvas !== null || context !== null) {
-        //transforma el punto a un punto relativo al canvas
-        const originalPoint = new DOMPoint(x, y);
-        console.log(originalPoint);
-        //el invert es utilizado por si el canvas es escalado
-        return context.getTransform().invertSelf().transformPoint(originalPoint);
-    }*/
 }
 
 const DrawTools = () => {
@@ -192,6 +187,9 @@ const DrawTools = () => {
                 setAction(actions.resizing);
             }
         }
+        else if(actual_tool === tools.eraser ){
+            setAction(actions.erasing);
+        }
         else {
             //crea un nuevo elemento y lo deja seleccionado
             const id = elements.length;
@@ -231,6 +229,17 @@ const DrawTools = () => {
             const { x1, y1, x2, y2 } = ResizeCoordinates(mouse_postion.x, mouse_postion.y, position, coordinates);
             UpdateElement(id, x1, y1, x2, y2, type);
         }
+        else if (actual_action === actions.erasing) {
+       
+        const element = GetElementAtPosition(mouse_postion.x, mouse_postion.y);
+        if (element) {
+            
+            let elements_copy = [...elements];
+            elements_copy = elements_copy.slice(element.id,1);
+            console.log(elements.length);
+            setElements(elements_copy);
+        }
+    }
     }
 
     const handleMouseUp = (event) => {
@@ -330,6 +339,15 @@ const DrawTools = () => {
                         onChange={() => setTool(tools.rectangle)}
                     />
                     <label htmlFor="rectangle">Rectangle</label>
+
+                    <input
+                        id="eraser"
+                        type="radio"
+                        checked={actual_tool === "eraser"}
+                        onChange={() => setTool(tools.eraser)}
+                    />
+                    <label htmlFor="eraser">eraser</label>
+
                 </div>
 
 

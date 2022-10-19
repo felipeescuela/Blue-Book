@@ -11,7 +11,7 @@ const CanvasDraw = ({
 
     //#region variables
     const window_ref = useRef();
-    const [dimensions, setDimensions] = useState({ width: 820, height: 820 });
+    const [dimensions, setDimensions] = useState({ width: 680, height: 680 });
 
     //variable auxiliar para el timer
     let time_post_change = null;
