@@ -17,7 +17,7 @@ const actions = {
     drawing: "drawing",
     moving: "moving",
     resizing: "resizing",
-    erasing : "erasing",
+    erasing: "erasing",
     none: "none"
 }
 
@@ -58,12 +58,11 @@ const type_verify = (type) => ["line", "rectangle", "ellipse"].includes(type);
 
 //variables canvas, hay que ver como hacer para que quede mejor
 let canvas = null;
-let context = null;
 
 const GetTransformedPointToCanvas = (x, y) => {
     var rect = canvas.getBoundingClientRect();
     return {
-        x: x - rect.left,       
+        x: x - rect.left,
         y: y - rect.top
     };
 }
@@ -80,7 +79,7 @@ const DrawTools = () => {
     useLayoutEffect(() => {
         //obtine el canvas y toda la parte 2d de el y la limpia
         canvas = document.getElementById("canvas");
-        context = canvas.getContext("2d");
+        const context = canvas.getContext("2d");
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         //instancia el canvas de rough en canvas
@@ -165,10 +164,10 @@ const DrawTools = () => {
     const handleMouseDown = (event) => {
         const { clientX, clientY } = event;
         const mouse_postion = GetTransformedPointToCanvas(clientX, clientY);
-       /* if (MouseX < 0 || MouseY < 0 || MouseX > canvas.width || MouseY > canvas.height) {
-            //en caso de quitarse el mouse del canvas desactiva las herramientas 
-            actual_tool = tools.none;
-        }*/
+        /* if (MouseX < 0 || MouseY < 0 || MouseX > canvas.width || MouseY > canvas.height) {
+             //en caso de quitarse el mouse del canvas desactiva las herramientas 
+             actual_tool = tools.none;
+         }*/
 
         if (actual_tool === tools.selection) {
             const element = GetElementAtPosition(mouse_postion.x, mouse_postion.y);
@@ -187,13 +186,13 @@ const DrawTools = () => {
                 setAction(actions.resizing);
             }
         }
-        else if(actual_tool === tools.eraser ){
+        else if (actual_tool === tools.eraser) {
             setAction(actions.erasing);
         }
         else {
             //crea un nuevo elemento y lo deja seleccionado
             const id = elements.length;
-            const element = CreateElement(id,mouse_postion.x, mouse_postion.y,mouse_postion.x, mouse_postion.y, actual_tool);
+            const element = CreateElement(id, mouse_postion.x, mouse_postion.y, mouse_postion.x, mouse_postion.y, actual_tool);
 
             setElements(prevState => [...prevState, element]);
             setSelectedElement(element);
@@ -229,17 +228,17 @@ const DrawTools = () => {
             const { x1, y1, x2, y2 } = ResizeCoordinates(mouse_postion.x, mouse_postion.y, position, coordinates);
             UpdateElement(id, x1, y1, x2, y2, type);
         }
-        else if (actual_action === actions.erasing) {  
-        const element = GetElementAtPosition(mouse_postion.x, mouse_postion.y);
-        if (element) {
-            
-            let elements_copy = [...elements];           
-            //filtra los elementos y solo saca el que tiene el mismo id
-            elements_copy = elements_copy.filter(e=>e.id!=element.id);
-            console.log(elements.length);
-            setElements(elements_copy);
+        else if (actual_action === actions.erasing) {
+            const element = GetElementAtPosition(mouse_postion.x, mouse_postion.y);
+            if (element) {
+
+                let elements_copy = [...elements];
+                //filtra los elementos y solo saca el que tiene el mismo id
+                elements_copy = elements_copy.filter(e => e.id != element.id);
+                console.log(elements.length);
+                setElements(elements_copy);
+            }
         }
-    }
     }
 
     const handleMouseUp = (event) => {
