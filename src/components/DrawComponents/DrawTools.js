@@ -229,13 +229,13 @@ const DrawTools = () => {
             const { x1, y1, x2, y2 } = ResizeCoordinates(mouse_postion.x, mouse_postion.y, position, coordinates);
             UpdateElement(id, x1, y1, x2, y2, type);
         }
-        else if (actual_action === actions.erasing) {
-       
+        else if (actual_action === actions.erasing) {  
         const element = GetElementAtPosition(mouse_postion.x, mouse_postion.y);
         if (element) {
             
-            let elements_copy = [...elements];
-            elements_copy = elements_copy.slice(element.id,1);
+            let elements_copy = [...elements];           
+            //filtra los elementos y solo saca el que tiene el mismo id
+            elements_copy = elements_copy.filter(e=>e.id!=element.id);
             console.log(elements.length);
             setElements(elements_copy);
         }
