@@ -56,9 +56,10 @@ const CreateElement = (id, x1, y1, x2, y2, type) => {
 const type_verify = (type) => ["line", "rectangle", "ellipse"].includes(type);
 
 
-//variables canvas, hay que ver como hacer para que quede mejor
+//variable auxiliar para podr usar el canvas correctamente con el mouse
 let canvas = null;
 
+//transforma el punto de la pantalla a un punto en el canvas
 const GetTransformedPointToCanvas = (x, y) => {
     var rect = canvas.getBoundingClientRect();
     return {
@@ -88,7 +89,7 @@ const DrawTools = () => {
         //dibuja cada elemento
         elements.forEach(({ roughElement }) => roughCanvas.draw(roughElement));
     });
-    //convierte el punto clickeado en un punto relativo al canvas
+
 
 
     //crea una copia de los elementos la edita y luego sobreescribe los elementos
