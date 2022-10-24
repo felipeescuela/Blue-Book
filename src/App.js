@@ -1,9 +1,9 @@
 import DrawTools from "./components/DrawComponents/DrawTools.js";
 import CanvasDraw from "./components/DrawComponents/CanvasDraw.js";
 import FileManager from "./components/FileManagerComponents/FileManager.js";
+import CanvasTextEditor from "./components/TextComponents/CanvasTextEditor.js";
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-
 import "./App.css"
 
 const filesExample = [
@@ -48,6 +48,11 @@ const App = () => {
                 <Grid id="headin" container columns={{ xs: 2 }} >
                     <Grid container id="title_menu" rows={{ xs: 3 }} xs={3}>
                         <h1 id="title">Informatica</h1>
+
+                        <Grid>
+                            <CanvasTextEditor />
+                        </Grid>
+                        
                         <Grid>
                             <ul className="navmenu">
                                 <li><Button variant="text">File</Button></li>
