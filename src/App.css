@@ -6,6 +6,10 @@
     width: 100%;
 }
 
+.editors{
+    outline: 2px solid black;
+}
+
 .App-logo {
     height: 40vmin;
     pointer-events: none;

@@ -23,7 +23,7 @@ const CanvasDraw = ({
     const get_dimensions = () => {
         if (window_ref.current) {
             setDimensions({
-                //me falta un poco de explicacion para entender esto(el flaco no sabia explicarlo)
+                //me falta un poco de explicacion para entender esto (el flaco no sabia explicarlo)
                 width: window_ref.current.offsetWidth,
                 height: window_ref.current.offsetHeight
             });
