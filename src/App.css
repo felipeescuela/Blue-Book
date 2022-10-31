@@ -8,6 +8,11 @@
 
 .editors{
     outline: 2px solid black;
+    position: absolute;
+    background-color: aliceblue;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
 }
 
 .App-logo {
@@ -28,6 +33,7 @@ header {
     position: sticky;
     top: 0%;
     background-color: rgb(47, 58, 79);
+    z-index: 2;
 }
 
 #headin {
@@ -35,6 +41,7 @@ header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    z-index: 2;
 }
 
 #title_menu {

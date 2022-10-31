@@ -95,10 +95,9 @@ const App = () => {
                             </li>
                         </ul>
                     </Grid>
-                    <Grid>
-                        <CanvasTextEditor />
-                    </Grid>
+                    
                     <Grid md={10} lg={15} id="pagina">
+                        <CanvasTextEditor />
                         <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
                     </Grid>
                     <Grid md={3} lg={3} id="gestor de archivos">
