@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useState } from "react";
 import rough from 'roughjs/bundled/rough.esm.js';
-
+import { getStroke } from 'perfect-freehand';
 
 const generator = rough.generator();
 
@@ -38,23 +38,73 @@ const CreateElement = (id, x1, y1, x2, y2, type) => {
         case types.line:
             roughElement = generator.line(x1, y1, x2, y2);
             return { id, x1, y1, x2, y2, type, roughElement };
-            break;
         case types.rectangle:
             //la resta al final sirve para poner el mouse en el vertice inferior derecho
             roughElement = generator.rectangle(x1, y1, x2 - x1, y2 - y1);
             return { id, x1, y1, x2, y2, type, roughElement };
-            break;
         case types.ellipse:
-            //TODO hay que buscar la manera para que el mouse no quede en el centro
             roughElement = generator.ellipse(x1, y1, x2 - x1, y2 - y1);
             return { id, x1, y1, x2, y2, type, roughElement };
+        case types.pencil:
+            //funciona con un array de puntos
+            return { id, type, points: [{ x: x1, y: y1 }] };
         default:
-            throw new Error("Invalid type");
+            throw new Error("Invalid type: " + type);
     }
 };
 
-const type_verify = (type) => ["line", "rectangle", "ellipse"].includes(type);
+//#region  Funcion de freehand framework
+const average = (a, b) => (a + b) / 2;
 
+const getSvgPathFromStroke = (points, closed = true) => {
+    const len = points.length
+
+    if (len < 4) {
+        return ``
+    }
+
+    let a = points[0]
+    let b = points[1]
+    const c = points[2]
+
+    let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(2)},${b[1].toFixed(
+        2
+    )} ${average(b[0], c[0]).toFixed(2)},${average(b[1], c[1]).toFixed(2)} T`
+
+    for (let i = 2, max = len - 1; i < max; i++) {
+        a = points[i]
+        b = points[i + 1]
+        result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(2)} `
+    }
+
+    if (closed) {
+        result += 'Z'
+    }
+
+    return result
+}
+//#endregion
+
+const DrawElement = (roughCanvas, context, element) => {
+    //aca esta el potencial del switch
+    switch (element.type) {
+        case types.line:
+        case types.rectangle:
+        case types.elipse:
+            roughCanvas.draw(element.roughElement);
+            break;
+        case types.pencil:
+            //stroke son los puntos en el array
+            //desoues del get podes entrar a las opciones del dibujo
+            const stroke = getSvgPathFromStroke(getStroke(element.points));
+            context.fill(new Path2D(stroke));
+            break;
+        default:
+            throw new Error("Invalid type: " + element.type);
+    }
+}
+
+const type_verify = (type) => ["line", "rectangle", "ellipse"].includes(type);
 
 //variable auxiliar para podr usar el canvas correctamente con el mouse
 let canvas = null;
@@ -86,8 +136,8 @@ const DrawTools = () => {
         //instancia el canvas de rough en canvas
         const roughCanvas = rough.canvas(canvas);
 
-        //dibuja cada elemento
-        elements.forEach(({ roughElement }) => roughCanvas.draw(roughElement));
+        //dibuja cada elemento (pencil no es un elemento del rough)
+        elements.forEach(element => DrawElement(roughCanvas, context, element));
     });
 
 
@@ -95,7 +145,19 @@ const DrawTools = () => {
     //crea una copia de los elementos la edita y luego sobreescribe los elementos
     const UpdateElement = (id, x1, y1, x2, y2, type) => {
         const elements_copy = [...elements];
-        elements_copy[id] = CreateElement(id, x1, y1, x2, y2, type);
+        switch (type) {
+            case types.line:
+            case types.rectangle:
+            case types.ellipse:
+                elements_copy[id] = CreateElement(id, x1, y1, x2, y2, type);
+                break;
+            case types.pencil:
+                elements_copy[id].points = [...elements_copy[id].points, { x: x2, y: y2 }];
+
+                break;
+            default:
+                throw new Error("Invalid type: " + type);
+        }
         setElements(elements_copy, true);
     };
 
@@ -163,6 +225,7 @@ const DrawTools = () => {
 
     //#region Mouse events
     const handleMouseDown = (event) => {
+        if (actual_tool === tools.none) return;
         const { clientX, clientY } = event;
         const mouse_postion = GetTransformedPointToCanvas(clientX, clientY);
         /* if (MouseX < 0 || MouseY < 0 || MouseX > canvas.width || MouseY > canvas.height) {
@@ -174,18 +237,27 @@ const DrawTools = () => {
             const element = GetElementAtPosition(mouse_postion.x, mouse_postion.y);
 
             if (element) {
-                const offsetX = mouse_postion.x - element.x1;
-                const offsetY = mouse_postion.y - element.y1;
-                setSelectedElement({ ...element, offsetX, offsetY });
-            }
-            setElements(prevState => prevState);
+                if (element.type === types.pencil) {
+                    const xOffsets = elements.points.map(point => point.x - mouse_postion.x);
+                    const yOffsets = elements.points.map(point => point.y - mouse_postion.y);
+                    setSelectedElement({ ...element, xOffsets, yOffsets });
+                }
+                else {
+                    const offsetX = mouse_postion.x - element.x1;
+                    const offsetY = mouse_postion.y - element.y1;
+                    setSelectedElement({ ...element, offsetX, offsetY });
 
-            if (element.position === "inside") {
-                setAction(actions.moving);
+                    setElements(prevState => prevState);
+
+                    if (element.position === "inside") {
+                        setAction(actions.moving);
+                    }
+                    else {
+                        setAction(actions.resizing);
+                    }
+                }
             }
-            else {
-                setAction(actions.resizing);
-            }
+
         }
         else if (actual_tool === tools.eraser) {
             setAction(actions.erasing);
@@ -217,12 +289,26 @@ const DrawTools = () => {
             UpdateElement(index, x1, y1, mouse_postion.x, mouse_postion.y, actual_tool);
         }
         else if (actual_action === actions.moving) {
-            const { id, x1, x2, y1, y2, type, offsetX, offsetY } = selected_element;
-            const width = x2 - x1;
-            const height = y2 - y1;
-            const newX1 = mouse_postion.x - offsetX;
-            const newY1 = mouse_postion.y - offsetY;
-            UpdateElement(id, newX1, newY1, newX1 + width, newY1 + height, type);
+            if (selected_element.type === types.pencil) {
+                const new_points = selected_element.points.map((points, index) => ({
+                    x: selected_element.xOffsets[index],
+                    y: selected_element.yOffsets[index]
+                }));
+                const elements_copy = [...elements];
+                elements_copy[selected_element.id] = {
+                    ...elements_copy(selected_element.id),
+                    points: new_points
+                };
+                setElements(elements_copy, true);
+            }
+            else {
+                const { id, x1, x2, y1, y2, type, offsetX, offsetY } = selected_element;
+                const width = x2 - x1;
+                const height = y2 - y1;
+                const newX1 = mouse_postion.x - offsetX;
+                const newY1 = mouse_postion.y - offsetY;
+                UpdateElement(id, newX1, newY1, newX1 + width, newY1 + height, type);
+            }
         }
         else if (actual_action === actions.resizing) {
             const { id, type, position, ...coordinates } = selected_element;
@@ -285,18 +371,28 @@ const DrawTools = () => {
     const PositionInsideElement = (x, y, element) => {
         const { type, x1, x2, y1, y2 } = element;
         switch (type) {
-            case "line":
+            case types.line:
                 const on = OnTheObject(x1, y1, x2, y2, x, y);
                 const start = OffsetOverPoint(x, y, x1, y1, "start");
                 const end = OffsetOverPoint(x, y, x2, y2, "end");
                 return start || end || on;
-            case "rectangle":
+            case types.rectangle:
                 const topLeft = OffsetOverPoint(x, y, x1, y1, "top-left");
                 const topRight = OffsetOverPoint(x, y, x2, y1, "top-right");
                 const bottomLeft = OffsetOverPoint(x, y, x1, y2, "bottom-left");
                 const bottomRight = OffsetOverPoint(x, y, x2, y2, "bottom-right");
                 const inside = x >= x1 && x <= x2 && y >= y1 && y <= y2 ? "inside" : null;
                 return topLeft || topRight || bottomLeft || bottomRight || inside;
+            case type.pencil:
+                //revisa si el mouse se encuentra entre los puntos de array
+                const BettwenAnyPoint = element.points.some((point, index) => {
+                    const next_point = element.points[index + 1];
+                    if (!next_point) return false;
+                    return OnTheObject(point.x, point.y, next_point.x, next_point.y, x, y, 5) !== null;
+                });
+
+                return BettwenAnyPoint ? "inside" : null;
+
             default:
                 throw new Error(`Type not recognised: ${type}`);
         }
@@ -325,9 +421,17 @@ const DrawTools = () => {
                     <label htmlFor="selection">Selection</label>
 
                     <input
+                        id="pencil"
+                        type="radio"
+                        checked={actual_tool === tools.pencil}
+                        onChange={() => setTool(tools.pencil)}
+                    />
+                    <label htmlFor="pencil">pencil</label>
+
+                    <input
                         id="line"
                         type="radio"
-                        checked={actual_tool === "line"}
+                        checked={actual_tool === tools.line}
                         onChange={() => setTool(tools.line)}
                     />
                     <label htmlFor="line">Line</label>
@@ -335,7 +439,7 @@ const DrawTools = () => {
                     <input
                         id="rectangle"
                         type="radio"
-                        checked={actual_tool === "rectangle"}
+                        checked={actual_tool === tools.rectangle}
                         onChange={() => setTool(tools.rectangle)}
                     />
                     <label htmlFor="rectangle">Rectangle</label>
@@ -343,10 +447,11 @@ const DrawTools = () => {
                     <input
                         id="eraser"
                         type="radio"
-                        checked={actual_tool === "eraser"}
+                        checked={actual_tool === tools.eraser}
                         onChange={() => setTool(tools.eraser)}
                     />
                     <label htmlFor="eraser">eraser</label>
+
 
                 </div>
 
