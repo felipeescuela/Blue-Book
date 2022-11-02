@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useState } from "react";
 import rough from 'roughjs/bundled/rough.esm.js';
 import { getStroke } from 'perfect-freehand';
-import { element } from "prop-types";
 
 const generator = rough.generator();
 
@@ -48,7 +47,7 @@ const CreateElement = (id, x1, y1, x2, y2, type) => {
             return { id, x1, y1, x2, y2, type, roughElement };
         case types.pencil:
             //funciona con un array de puntos
-            return{id,type,points: [{x:x1,y1}]};
+            return { id, type, points: [{ x: x1, y: y1 }] };
         default:
             throw new Error("Invalid type: " + type);
     }
@@ -58,35 +57,35 @@ const CreateElement = (id, x1, y1, x2, y2, type) => {
 const average = (a, b) => (a + b) / 2;
 
 const getSvgPathFromStroke = (points, closed = true) => {
-  const len = points.length
+    const len = points.length
 
-  if (len < 4) {
-    return ``
-  }
+    if (len < 4) {
+        return ``
+    }
 
-  let a = points[0]
-  let b = points[1]
-  const c = points[2]
+    let a = points[0]
+    let b = points[1]
+    const c = points[2]
 
-  let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(2)},${b[1].toFixed(
-    2
-  )} ${average(b[0], c[0]).toFixed(2)},${average(b[1], c[1]).toFixed(2)} T`
+    let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(2)},${b[1].toFixed(
+        2
+    )} ${average(b[0], c[0]).toFixed(2)},${average(b[1], c[1]).toFixed(2)} T`
 
-  for (let i = 2, max = len - 1; i < max; i++) {
-    a = points[i]
-    b = points[i + 1]
-    result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(2)} `
-  }
+    for (let i = 2, max = len - 1; i < max; i++) {
+        a = points[i]
+        b = points[i + 1]
+        result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(2)} `
+    }
 
-  if (closed) {
-    result += 'Z'
-  }
+    if (closed) {
+        result += 'Z'
+    }
 
-  return result
+    return result
 }
 //#endregion
 
-const DrawElement = (roughCanvas,context, element) => {
+const DrawElement = (roughCanvas, context, element) => {
     //aca esta el potencial del switch
     switch (element.type) {
         case types.line:
@@ -98,11 +97,11 @@ const DrawElement = (roughCanvas,context, element) => {
             //stroke son los puntos en el array
             //desoues del get podes entrar a las opciones del dibujo
             const stroke = getSvgPathFromStroke(getStroke(element.points));
-            context.fill( new Path2D(stroke));
+            context.fill(new Path2D(stroke));
             break;
         default:
             throw new Error("Invalid type: " + element.type);
-}
+    }
 }
 
 const type_verify = (type) => ["line", "rectangle", "ellipse"].includes(type);
@@ -138,7 +137,7 @@ const DrawTools = () => {
         const roughCanvas = rough.canvas(canvas);
 
         //dibuja cada elemento (pencil no es un elemento del rough)
-        elements.forEach(element => DrawElement(roughCanvas,context, element));
+        elements.forEach(element => DrawElement(roughCanvas, context, element));
     });
 
 
@@ -153,9 +152,9 @@ const DrawTools = () => {
                 elements_copy[id] = CreateElement(id, x1, y1, x2, y2, type);
                 break;
             case types.pencil:
-                elements_copy[id].points = [...elements_copy[id].points, { x:x2, y:y2 }];
+                elements_copy[id].points = [...elements_copy[id].points, { x: x2, y: y2 }];
 
-            break;
+                break;
             default:
                 throw new Error("Invalid type: " + type);
         }
@@ -226,7 +225,7 @@ const DrawTools = () => {
 
     //#region Mouse events
     const handleMouseDown = (event) => {
-        if(actual_tool === tools.none) return;
+        if (actual_tool === tools.none) return;
         const { clientX, clientY } = event;
         const mouse_postion = GetTransformedPointToCanvas(clientX, clientY);
         /* if (MouseX < 0 || MouseY < 0 || MouseX > canvas.width || MouseY > canvas.height) {
@@ -238,12 +237,12 @@ const DrawTools = () => {
             const element = GetElementAtPosition(mouse_postion.x, mouse_postion.y);
 
             if (element) {
-                if(element.type === types.pencil){
+                if (element.type === types.pencil) {
                     const xOffsets = elements.points.map(point => point.x - mouse_postion.x);
                     const yOffsets = elements.points.map(point => point.y - mouse_postion.y);
                     setSelectedElement({ ...element, xOffsets, yOffsets });
                 }
-                else{
+                else {
                     const offsetX = mouse_postion.x - element.x1;
                     const offsetY = mouse_postion.y - element.y1;
                     setSelectedElement({ ...element, offsetX, offsetY });
@@ -290,19 +289,19 @@ const DrawTools = () => {
             UpdateElement(index, x1, y1, mouse_postion.x, mouse_postion.y, actual_tool);
         }
         else if (actual_action === actions.moving) {
-            if(selected_element.type === types.pencil){
-                const new_points = selected_element.points.map((points,index )=> ({
-                    x:selected_element.xOffsets[index],
-                    y:selected_element.yOffsets[index]
+            if (selected_element.type === types.pencil) {
+                const new_points = selected_element.points.map((points, index) => ({
+                    x: selected_element.xOffsets[index],
+                    y: selected_element.yOffsets[index]
                 }));
                 const elements_copy = [...elements];
-                elements_copy[selected_element.id]={
+                elements_copy[selected_element.id] = {
                     ...elements_copy(selected_element.id),
-                    points:new_points
+                    points: new_points
                 };
                 setElements(elements_copy, true);
             }
-            else{
+            else {
                 const { id, x1, x2, y1, y2, type, offsetX, offsetY } = selected_element;
                 const width = x2 - x1;
                 const height = y2 - y1;
@@ -386,14 +385,13 @@ const DrawTools = () => {
                 return topLeft || topRight || bottomLeft || bottomRight || inside;
             case type.pencil:
                 //revisa si el mouse se encuentra entre los puntos de array
-                const BettwenAnyPoint = element.points.some((point,index)=>{
-                    const next_point = element.points[index+1];
-                    if(!next_point) return false;
-                    return OnTheObject(point.x,point.y,next_point.x,next_point.y,x,y,5)!==null;
+                const BettwenAnyPoint = element.points.some((point, index) => {
+                    const next_point = element.points[index + 1];
+                    if (!next_point) return false;
+                    return OnTheObject(point.x, point.y, next_point.x, next_point.y, x, y, 5) !== null;
                 });
-            
+
                 return BettwenAnyPoint ? "inside" : null;
-                break;
 
             default:
                 throw new Error(`Type not recognised: ${type}`);
