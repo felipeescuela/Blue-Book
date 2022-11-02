@@ -1,3 +1,4 @@
+//#region imports
 import DrawTools from "./components/DrawComponents/DrawTools.js";
 import CanvasDraw from "./components/DrawComponents/CanvasDraw.js";
 import FileManager from "./components/FileManagerComponents/FileManager.js";
@@ -5,7 +6,9 @@ import CanvasTextEditor from "./components/TextComponents/CanvasTextEditor.js";
 import TextTools from "./components/TextComponents/TextTools.js";
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import Sheet from "./components/Sheet.js";
 import "./App.css"
+//#endregion
 
 const filesExample = [
     {
@@ -53,7 +56,7 @@ const App = () => {
                         <Grid>
                             <TextTools />
                         </Grid>
-                        
+
                         <Grid>
                             <ul className="navmenu">
                                 <li><Button variant="text">File</Button></li>
@@ -95,10 +98,9 @@ const App = () => {
                             </li>
                         </ul>
                     </Grid>
-                    
+
                     <Grid md={10} lg={15} id="pagina">
-                        <CanvasTextEditor />
-                        <CanvasDraw handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
+                        <Sheet handleMouseDown={handleMouseDown} handleMouseMove={handleMouseMove} handleMouseUp={handleMouseUp} />
                     </Grid>
                     <Grid md={3} lg={3} id="gestor de archivos">
                         <FileManager files={filesExample}></FileManager>
