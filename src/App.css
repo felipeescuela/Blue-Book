@@ -6,13 +6,20 @@
     width: 100%;
 }
 
-.editors{
-    outline: 2px solid black;
+.editors {
+    /* outline: 2px solid black; */
     position: absolute;
     background-color: aliceblue;
-    height: 100%;
-    width: 100%;
-    z-index: 1;
+    top: 0;
+}
+
+/* los tamaños hay que cambiarlos desde Sheet.js */
+canvas {
+    border-style: solid;
+}
+
+.sheet {
+    position: relative;
 }
 
 .App-logo {
@@ -100,10 +107,10 @@ a {
     color: #61dafb;
 }
 
-#title_menu{
-  width: 100%;
-  display: flex;
-  flex-direction: row;
+#title_menu {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
 
 }
 
@@ -129,9 +136,6 @@ a {
     justify-content: flex-start;
 }
 
-canvas {
-    border-style: solid;
-}
 
 .icon {
     height: 20px;

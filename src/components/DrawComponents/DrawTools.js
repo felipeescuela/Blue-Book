@@ -72,10 +72,13 @@ const DrawTools = () => {
     //#region states
     const [elements, setElements] = useState([]);
     const [actual_action, setAction] = useState(actions.none);
-    const [actual_tool, setTool] = useState(tools.none);
+    const [actual_tool, setActualTool] = useState(tools.none);
     const [selected_element, setSelectedElement] = useState(null);
     //#endregion
+    function setTool(tool) {
+        setActualTool(tool);
 
+    }
     //espera a que todo cargue, y obtiene todo lo del canvas y dibuja los elementos
     useLayoutEffect(() => {
         //obtine el canvas y toda la parte 2d de el y la limpia

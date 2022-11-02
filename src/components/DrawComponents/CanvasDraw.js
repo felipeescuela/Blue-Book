@@ -4,6 +4,8 @@ import React, { useRef, useLayoutEffect, useState } from "react";
 
 const CanvasDraw = ({
     //recibe las funciones de DrawTools.js
+    new_dimensions,
+    actul_editor,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp
@@ -11,7 +13,7 @@ const CanvasDraw = ({
 
     //#region variables
     const window_ref = useRef();
-    const [dimensions, setDimensions] = useState({ width: 680, height: 680 });
+    const [dimensions, setDimensions] = useState({ width: new_dimensions.width, height: new_dimensions.height, zIndex: actul_editor == "canvas" ? 2 : -1 });
 
     //variable auxiliar para el timer
     let time_post_change = null;
@@ -43,14 +45,14 @@ const CanvasDraw = ({
 
     return (
         <canvas
-        id="canvas"
-        width={dimensions.width}
-        height={dimensions.height}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}>
-        
-      </canvas>
+            id="canvas"
+            width={dimensions.width}
+            height={dimensions.height}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}>
+
+        </canvas>
     );
 }
 

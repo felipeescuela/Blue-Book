@@ -1,8 +1,6 @@
 //#region imports
 import DrawTools from "./components/DrawComponents/DrawTools.js";
-import CanvasDraw from "./components/DrawComponents/CanvasDraw.js";
 import FileManager from "./components/FileManagerComponents/FileManager.js";
-import CanvasTextEditor from "./components/TextComponents/CanvasTextEditor.js";
 import TextTools from "./components/TextComponents/TextTools.js";
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
